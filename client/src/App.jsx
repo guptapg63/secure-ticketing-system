@@ -2,22 +2,49 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 
+/**
+ * Main Application Component
+ * Handles global routing and authentication-guarded navigation.
+ */
 function App() {
   return (
     <Router>
-      {/* Configuration for global notifications */}
+      {/* Global notification provider */}
       <Toaster position="top-right" reverseOrder={false} />
       
       <Routes>
+        {/* Public Authentication Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         
-        {/* Default route redirects to login */}
-        <Route path="/" element={<Navigate to="/login" />} />
+        {/* 
+          Protected Dashboard Routes 
+          Access is restricted to authenticated users via ProtectedRoute.
+        */}
+        <Route 
+          path="/user-dashboard" 
+          element={
+            <ProtectedRoute allowedRoles={['user']}>
+              <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
+
+        <Route 
+          path="/admin-dashboard" 
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } 
+        />
         
-        {/* Placeholder for Dashboard - will be protected in next step */}
-        <Route path="/dashboard" element={<div className="p-10 text-2xl">Dashboard Under Construction</div>} />
+        {/* Default redirect to login for undefined paths */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );

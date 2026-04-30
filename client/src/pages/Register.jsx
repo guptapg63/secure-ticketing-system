@@ -21,6 +21,7 @@ const Register = () => {
     }
 
     try {
+      // Sending only necessary fields to the backend
       await API.post('/auth/register', {
         name: formData.name,
         email: formData.email,
@@ -36,54 +37,62 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 border border-gray-200">
-        <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">User Registration</h2>
+      <div className="max-w-md w-full bg-white rounded-xl shadow-xl p-8 border border-gray-200">
+        <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-2">Create Account</h2>
+        <p className="text-center text-gray-500 mb-8 text-sm">Join the support desk community today.</p>
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700">Full Name</label>
+            <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Full Name</label>
             <input 
               type="text" required
-              placeholder="John Doe"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+              value={formData.name}
+              placeholder="Enter your name"
+              className="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none transition-all"
               onChange={(e) => setFormData({...formData, name: e.target.value})}
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700">Email Address</label>
+            <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Email Address</label>
             <input 
               type="email" required
-              placeholder="john@example.com"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+              value={formData.email}
+              placeholder="email@example.com"
+              className="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none transition-all"
               onChange={(e) => setFormData({...formData, email: e.target.value})}
             />
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700">Password</label>
-            <input 
-              type="password" required
-              placeholder="••••••••"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700">Confirm Password</label>
-            <input 
-              type="password" required
-              placeholder="••••••••"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
-              onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Password</label>
+              <input 
+                type="password" required
+                value={formData.password}
+                placeholder="••••••••"
+                className="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none transition-all"
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Confirm</label>
+              <input 
+                type="password" required
+                value={formData.confirmPassword}
+                placeholder="••••••••"
+                className="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none transition-all"
+                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+              />
+            </div>
           </div>
           <button 
             type="submit" 
-            className="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:bg-green-700 active:scale-95 transition-all shadow-md mt-2"
+            className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 active:scale-95 transition-all shadow-lg mt-4"
           >
             Register Now
           </button>
         </form>
         <div className="mt-6 text-center text-sm text-gray-600">
-          Already have an account? <Link to="/login" className="text-blue-600 hover:underline font-bold">Sign In</Link>
+          Already have an account? <Link to="/login" className="text-green-600 hover:underline font-bold">Sign In</Link>
         </div>
       </div>
     </div>

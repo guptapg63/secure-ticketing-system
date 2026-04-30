@@ -7,23 +7,45 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('userInfo');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
+    const initializeAuth = () => {
+      try {
+        const savedUser = localStorage.getItem('userInfo');
+        const token = localStorage.getItem('token');
+
+        if (savedUser && savedUser !== "undefined" && token) {
+          setUser(JSON.parse(savedUser));
+        }
+      } catch (error) {
+        console.error("Session initialization failed:", error);
+        localStorage.clear(); 
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
   }, []);
 
-  const login = (userData) => {
-    setUser(userData);
+  const login = (authResponse) => {
+    // Extracts token and user from various possible backend formats
+    const token = authResponse?.token || authResponse?.data?.token;
+    const userData = authResponse?.user || authResponse?.data?.user;
+
+    if (!token || !userData) {
+      console.error("Invalid login response:", authResponse);
+      return;
+    }
+
+    localStorage.setItem('token', token);
     localStorage.setItem('userInfo', JSON.stringify(userData));
-    localStorage.setItem('token', userData.token);
+    
+    setUser(userData);
   };
 
   const logout = () => {
-    setUser(null);
     localStorage.removeItem('userInfo');
     localStorage.removeItem('token');
+    setUser(null);
   };
 
   return (
