@@ -57,3 +57,55 @@ export const getAllTickets = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
+/**
+ * @desc    Update ticket (Admin only)
+ * @route   PUT /api/tickets/:id
+ * @access  Private/Admin
+ */
+export const updateTicket = async (req, res) => {
+  try {
+    const ticket = await Ticket.findById(req.params.id);
+
+    if (!ticket) {
+      return res.status(404).json({ message: 'Ticket not found' });
+    }
+
+    const updatedTicket = await Ticket.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true } // Returns the updated document
+    );
+
+    res.json(updatedTicket);
+  } catch (error) {
+    console.error(`Error in updateTicket: ${error.message}`);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+/**
+ * @desc    Delete ticket (User who created it)
+ * @route   DELETE /api/tickets/:id
+ * @access  Private
+ */
+export const deleteTicket = async (req, res) => {
+  try {
+    const ticket = await Ticket.findById(req.params.id);
+
+    if (!ticket) {
+      return res.status(404).json({ message: 'Ticket not found' });
+    }
+
+    // Security Check: Only the owner of the ticket can delete it
+    if (ticket.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: 'User not authorized to delete this ticket' });
+    }
+
+    await ticket.deleteOne();
+    res.json({ message: 'Ticket removed successfully' });
+  } catch (error) {
+    console.error(`Error in deleteTicket: ${error.message}`);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
