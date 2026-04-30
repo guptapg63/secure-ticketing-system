@@ -1,4 +1,5 @@
 import Ticket from '../models/Ticket.js';
+import { validationResult } from 'express-validator';
 
 /**
  * @desc    Create a new support ticket
@@ -6,15 +7,20 @@ import Ticket from '../models/Ticket.js';
  * @access  Private
  */
 export const createTicket = async (req, res) => {
+  // 1. Check for validation errors from express-validator
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ 
+      success: false, 
+      errors: errors.array() 
+    });
+  }
+
   const { subject, description, priority } = req.body;
 
   try {
-    if (!subject || !description) {
-      return res.status(400).json({ message: 'Subject and description are required' });
-    }
-
     const ticket = await Ticket.create({
-      user: req.user._id, 
+      user: req.user._id, // Set by protect middleware
       subject,
       description,
       priority: priority || 'Low',
@@ -34,7 +40,8 @@ export const createTicket = async (req, res) => {
  */
 export const getMyTickets = async (req, res) => {
   try {
-    const tickets = await Ticket.find({ user: req.user._id });
+    // Sort by most recent first
+    const tickets = await Ticket.find({ user: req.user._id }).sort({ createdAt: -1 });
     res.json(tickets);
   } catch (error) {
     console.error(`Error in getMyTickets: ${error.message}`);
@@ -49,8 +56,11 @@ export const getMyTickets = async (req, res) => {
  */
 export const getAllTickets = async (req, res) => {
   try {
-    // Fetch all tickets and populate the user details (name and email)
-    const tickets = await Ticket.find({}).populate('user', 'name email');
+    // Populate user details to show who raised the ticket
+    const tickets = await Ticket.find({})
+      .populate('user', 'name email')
+      .sort({ createdAt: -1 });
+      
     res.json(tickets);
   } catch (error) {
     console.error(`Error in getAllTickets: ${error.message}`);
@@ -59,7 +69,7 @@ export const getAllTickets = async (req, res) => {
 };
 
 /**
- * @desc    Update ticket (Admin only)
+ * @desc    Update ticket status/priority (Admin only)
  * @route   PUT /api/tickets/:id
  * @access  Private/Admin
  */
@@ -74,7 +84,10 @@ export const updateTicket = async (req, res) => {
     const updatedTicket = await Ticket.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true } // Returns the updated document
+      { 
+        returnDocument: 'after', // Returns the updated doc, not the old one
+        runValidators: true      // Ensures updates also follow Schema rules
+      } 
     );
 
     res.json(updatedTicket);
