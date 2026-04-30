@@ -27,11 +27,11 @@ export const registerUser = async (req, res, next) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role, // Added to provide role data to the client
         token: generateToken(user._id),
       });
     }
   } catch (error) {
-    // Standard professional logging for production debugging
     console.error(`Error in registerUser: ${error.message}`);
     
     res.status(500).json({ 
@@ -50,6 +50,7 @@ export const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
+    // Explicitly selecting password for comparison while fetching the user
     const user = await User.findOne({ email }).select('+password');
 
     if (user && (await user.matchPassword(password))) {
@@ -57,6 +58,7 @@ export const loginUser = async (req, res, next) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role, // Added to ensure role-based routing functions correctly
         token: generateToken(user._id),
       });
     } else {
