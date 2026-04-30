@@ -21,12 +21,20 @@ const Register = () => {
     }
 
     try {
-      // Sending only necessary fields to the backend
-      await API.post('/auth/register', {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password
-      });
+      // Sending only necessary fields to the backend with explicit JSON headers
+      await API.post(
+        '/auth/register',
+        {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
       
       toast.success('Registration successful. You can now log in.');
       navigate('/login');
